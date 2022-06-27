@@ -9,11 +9,24 @@ To pull images from a private registry, you must authenticate to that registry.
 There are several ways to authenticate the registry,<br>
 but [You can authenticate using a kubernetes secret type of type dockerconfigjson.](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials)
 
-prs-manager calls it `Private Registry Secret.`
+prs-manager calls it `Private Registry Secret`.
+
+## How 'Private Registry Secret' is managed
+
+By default, if there is no `private registry secret`, create it
+
+if there are `personal registration secrets`, it is managed differently depending on the type.
+(prs-manager manages only `secret` created by itself.)
+- ECR
+  - If the ECR token expires, update token and replace `personal registration secrets`.
+- DOCKER
+  - If the secret configuration is updated, replace `personal registration secrets`.
+
+also, if there is a `personal registration secrets` that does not exist in 'secret configuration', delete it.
 
 ## Configuration
 
-Edit the helm value(default or create custom value) to manage `Private Registry Secret.`<br>
+Edit the helm value(default or create custom value) to manage `Private Registry Secret`.
 
 ```yaml
 name: prs-manager
