@@ -3,7 +3,7 @@ Create and manage `Private Registry Secret` to pull images from private registry
 
 prs-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages `Private Registry Secrets`.
 
-## What's the Private Registry Secret?
+### What's the Private Registry Secret?
 To pull images from a private registry, you must authenticate to that registry.
 
 There are several ways to authenticate the registry,<br>
@@ -11,7 +11,7 @@ but [You can authenticate using a kubernetes secret type of type dockerconfigjso
 
 prs-manager calls it `Private Registry Secret`.
 
-## How 'Private Registry Secret' is managed
+### How 'Private Registry Secret' is managed
 
 By default, if there is no `private registry secret`, it will be created
 
