@@ -13,16 +13,16 @@ prs-manager calls it `Private Registry Secret`.
 
 ## How 'Private Registry Secret' is managed
 
-By default, if there is no `private registry secret`, create it
+By default, if there is no `private registry secret`, it will be created
 
-if there are `personal registration secrets`, it is managed differently depending on the type.
+if there is `personal registration secret`, it will be updated differently depending on the type.<br>
 (prs-manager manages only `secret` created by itself.)
 - ECR
   - If the ECR token expires, update token and replace `personal registration secrets`.
 - DOCKER
   - If the secret configuration is updated, replace `personal registration secrets`.
 
-also, if there is a `personal registration secrets` that does not exist in 'secret configuration', delete it.
+also, if there is `personal registration secrets` that does not exist in 'secret configuration', it will be deleted
 
 ## Configuration
 
