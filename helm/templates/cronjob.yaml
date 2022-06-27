@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+spec:
+  schedule:  {{ .Values.job_schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ .Values.name }}-sa
+          containers:
+          - name: {{ .Values.name }}
+            image: {{ .Values.image.name }}:{{ .Values.image.version }}
+            imagePullPolicy: {{ .Values.imagePullPolicy }}
+            volumeMounts:
+            - name: application-conf
+              mountPath: /usr/src/conf/secret.yaml
+              subPath: secret.yaml
+              readOnly: true
+          restartPolicy: OnFailure
+          volumes:
+            - name: application-conf
+              configMap:
+                name: {{ .Values.name }}-conf

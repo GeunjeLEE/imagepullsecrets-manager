@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name }}-conf
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+  annotations:
+    auto-deploy-flag: {{ print .Values.config | sha256sum }}
+data:
+  secret.yaml: |-
+{{- toYaml .Values.config | nindent 4 }}

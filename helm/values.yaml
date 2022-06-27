@@ -1,0 +1,24 @@
+name: prs-manager
+namespace: default
+image:
+    name: nigasa12/prs-manager
+    version: "0.1"
+imagePullPolicy: IfNotPresent
+job_schedule: "0 * * * *"
+config:
+  secrets:
+    - name: ecr-dev
+      kubernetes_namespace: default
+      type: ECR
+      credential:
+        aws_access_key_id: foobargem
+        aws_secret_access_key: foobargem
+        aws_ecr_repository_region: ap-northeast-2
+    - name: docker-example
+      kubernetes_namespace: default
+      type: DOCKER
+      credential:
+        docker_registry: docker.io
+        docker_user: foobargem
+        docker_password: password
+        docker_email: foobargem@example.com
