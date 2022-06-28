@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 class KubernetesSecretConnector():
 
     def __init__(self):
-        self.config        = k8s_config.load_config()
+        self.config        = k8s_config.load_incluster_config()
         self.secret_client = k8s_client.V1Secret()
         self.core_api      = k8s_client.CoreV1Api()
 
