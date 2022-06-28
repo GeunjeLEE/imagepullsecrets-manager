@@ -65,6 +65,6 @@ helm install prs-manager ./helm
 ```
 - using custom value
 ```bash
-vim values.yaml
-helm install prs-manager -f values.yaml ./helm
+vim {path}/values.yaml
+helm install prs-manager -f values.yaml {prs-manager}/helm
 ```
