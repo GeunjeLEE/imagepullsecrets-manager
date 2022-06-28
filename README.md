@@ -1,4 +1,4 @@
-# prs-manager
+# private-registry-secret-manager(a.k.a prs-manager)
 Create and manage `Private Registry Secret` to pull images from private registry (ECR or Docker Hub)
 
 prs-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages `Private Registry Secrets`.
