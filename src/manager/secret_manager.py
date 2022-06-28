@@ -41,7 +41,7 @@ class SecretManager():
         kubernetes_namespace    = self.secret_config['kubernetes_namespace']
         secret_data             = {
             'labels': {
-                'created_by': 'credential_manager',
+                'created_by': 'private_registry_secret_manager',
                 'repo_type': self.secret_config['type'],
                 'expire_date': str(self.repository_credential['token_expire_date'])
             },
