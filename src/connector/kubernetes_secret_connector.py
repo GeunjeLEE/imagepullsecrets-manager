@@ -3,7 +3,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-class KubernetesSecretConnector():
+class KubernetesSecretConnector:
     def __init__(self):
         self.config        = k8s_config.load_incluster_config()
         self.secret_client = k8s_client.V1Secret()
@@ -12,7 +12,7 @@ class KubernetesSecretConnector():
     def secret_list_by_ns(self):
         try:
             secrets = self.core_api.list_secret_for_all_namespaces(
-                label_selector="created_by=credential_manager",
+                label_selector="created_by=private_registry_secret_manager",
             ).items
         except Exception as e:
             raise e
@@ -61,6 +61,6 @@ class KubernetesSecretConnector():
     def delete(self, name, namespace = 'default'):
         try:
             self.core_api.delete_namespaced_secret(name=name,namespace=namespace)
-            logging.info(f'{name} has been deleted successfully!')
+            logging.info(f'found the old secret {name}, it will be deleted!')
         except Exception as e:
             raise e
