@@ -3,7 +3,7 @@ import boto3
 logging.basicConfig(level=logging.INFO)
 
 
-class EcrConnector():
+class EcrConnector:
     def __init__(self, aws_credentials):
         self.aws_access_key_id = aws_credentials['aws_access_key_id']
         self.aws_secret_access_key = aws_credentials['aws_secret_access_key']
