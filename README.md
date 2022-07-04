@@ -24,7 +24,9 @@ if there is `personal registration secret`, it will be updated differently depen
 
 also, if there is `personal registration secrets` that does not exist in 'secret configuration', it will be deleted
 
-## Configuration
+## How to use?
+
+### configure
 
 Edit the helm value(default or create custom value) to manage `Private Registry Secret`.
 
@@ -55,7 +57,7 @@ config:
         docker_email: foobargem@example.com
 ```
 
-## Deployment
+### deploy
 
 `psr-manager` is deployed using the local helm chart.
 
@@ -67,4 +69,10 @@ helm install prs-manager ./helm
 ```bash
 vim {path}/values.yaml
 helm install prs-manager -f values.yaml {prs-manager}/helm
+```
+
+### update
+
+```
+helm upgrade prs-manager {-f values.yaml} ./helm
 ```
