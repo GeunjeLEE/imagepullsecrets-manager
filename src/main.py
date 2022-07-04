@@ -1,7 +1,8 @@
-from manager.secret_manager import SecretManager
+from service.secret_service import SecretService
 import yaml
 import logging
 import sys
+
 
 def _get_config():
     try:
@@ -11,16 +12,17 @@ def _get_config():
         logging.error(f"config file not found: {e}")
         sys.exit(1)
 
+
 def main():
-    secret_manager = SecretManager()
+    secret_service = SecretService()
     config = _get_config()
 
     for secret_config in config:
-        secret_manager.set_config(secret_config)
-        secret_manager.run()
+        secret_service.set_config(secret_config)
+        secret_service.run()
 
-    secret_manager.clean_up(config)
+    secret_service.clean_up(config)
+
 
 if __name__ == '__main__':
     main()
-

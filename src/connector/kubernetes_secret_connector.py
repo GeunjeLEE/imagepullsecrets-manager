@@ -1,10 +1,9 @@
 from kubernetes import client as k8s_client, config as k8s_config
 import logging
-import sys
 logging.basicConfig(level=logging.INFO)
 
-class KubernetesSecretConnector():
 
+class KubernetesSecretConnector():
     def __init__(self):
         self.config        = k8s_config.load_incluster_config()
         self.secret_client = k8s_client.V1Secret()

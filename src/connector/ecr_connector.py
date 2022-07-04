@@ -1,7 +1,7 @@
 import logging
-import sys
 import boto3
 logging.basicConfig(level=logging.INFO)
+
 
 class EcrConnector():
     def __init__(self, aws_credentials):

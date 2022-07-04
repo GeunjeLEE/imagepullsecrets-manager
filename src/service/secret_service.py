@@ -7,8 +7,7 @@ import sys
 import time
 
 
-class SecretManager():
-
+class SecretService():
     def __init__(self):
         self.secret_config = None
         self.secret_connector = KubernetesSecretConnector()
@@ -29,7 +28,7 @@ class SecretManager():
 
         for namespace, _ in actual_secret_list_by_ns.items():
             for actual_name in actual_secret_list_by_ns[namespace]:
-                if not credential_by_ns.get(namespace, None) or actual_name not in credential_by_ns[namespace]:
+                if not credential_by_ns.get(namespace) or actual_name not in credential_by_ns[namespace]:
                     self.secret_connector.delete(actual_name,namespace)
 
     def run(self):
@@ -37,9 +36,9 @@ class SecretManager():
             logging.error("No configuration set.")
             sys.exit(1)
 
-        secret_name             = self.secret_config['name']
-        kubernetes_namespace    = self.secret_config['kubernetes_namespace']
-        secret_data             = {
+        secret_name  = self.secret_config['name']
+        kubernetes_namespace = self.secret_config['kubernetes_namespace']
+        secret_data = {
             'labels': {
                 'created_by': 'private_registry_secret_manager',
                 'repo_type': self.secret_config['type'],
@@ -68,23 +67,22 @@ class SecretManager():
                 self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=False)
 
     def _generate_repository_credential(self, secret_config):
-
         credential = {}
         if secret_config['type'] == 'ECR':
             ecr_authorization_token = self._get_ecr_authorization_token(secret_config['credential'])
 
-            credential['token_expire_date']   = time.mktime(ecr_authorization_token['token_expire_date'].timetuple()) # convert to unix time
-            user, password                    = self._data_b64decode(ecr_authorization_token['server']).split(':')  ## server key has token...
-            server                            = ecr_authorization_token['token']  ## token key has repository url...
-            email                             = 'manager@cloudforet.io'
+            credential['token_expire_date'] = time.mktime(ecr_authorization_token['token_expire_date'].timetuple()) # convert to unix time
+            user, password = self._data_b64decode(ecr_authorization_token['server']).split(':')  ## server key has token...
+            server = ecr_authorization_token['token']  ## token key has repository url...
+            email = 'service@cloudforet.io'
 
 
         elif secret_config['type'] == 'DOCKER':
-            credential['token_expire_date']   = None
-            user                        = secret_config['credential']['docker_user']
-            password                    = secret_config['credential']['docker_password']
-            server                      = secret_config['credential']['docker_registry']
-            email                       = secret_config['credential']['docker_email']
+            credential['token_expire_date'] = None
+            user = secret_config['credential']['docker_user']
+            password = secret_config['credential']['docker_password']
+            server = secret_config['credential']['docker_registry']
+            email = secret_config['credential']['docker_email']
 
         else:
             logging.error("type error")
@@ -94,7 +92,33 @@ class SecretManager():
 
         return credential
 
-    def _get_ecr_authorization_token(self, aws_credential):
+    def _generate_dockerjson(self, url, username, password, email):
+        auth = self._data_b64encode(f'{username}:{password}')
+
+        row_data = {
+            "auths": {
+                    url: {
+                        "username": username,
+                        "password": password,
+                        "email": email,
+                        "auth": auth
+                    }
+            }
+        }
+
+        return base64.b64encode(json.dumps(row_data).encode()).decode()
+
+    def _is_configuration_updated(self, secret):
+        secret_json = secret.data['.dockerconfigjson']
+        config_json = self.repository_credential['dockerconfigjson']
+
+        if secret_json != config_json:
+            return True
+
+        return False
+
+    @staticmethod
+    def _get_ecr_authorization_token(aws_credential):
         ecr = EcrConnector(aws_credential)
         authorization = ecr.get_authorization_token()
 
@@ -107,23 +131,8 @@ class SecretManager():
             'token_expire_date': authorization['authorizationData'][0]['expiresAt']
         }
 
-    def _generate_dockerjson(self, url, username, password, email):
-        auth = self._data_b64encode(f'{username}:{password}')
-
-        row_data = {
-            "auths": {
-                    url: {
-                        "username":username,
-                        "password":password,
-                        "email":email,
-                        "auth":auth
-                    }
-            }
-        }
-
-        return base64.b64encode(json.dumps(row_data).encode()).decode()
-
-    def _is_token_expired(self, token_expiration_float):
+    @staticmethod
+    def _is_token_expired(token_expiration_float):
         if not token_expiration_float:
             return False
 
@@ -133,18 +142,11 @@ class SecretManager():
 
         return False
 
-    def _is_configuration_updated(self, secret):
-        secret_json = secret.data['.dockerconfigjson']
-        config_json = self.repository_credential['dockerconfigjson']
+    @staticmethod
+    def _data_b64encode(input_str):
+        input_ascii = input_str.encode("ascii")
+        return base64.b64encode(input_ascii).decode("utf-8")
 
-        if secret_json != config_json:
-            return True
-
-        return False
-
-    def _data_b64encode(self, str):
-        ascii = str.encode("ascii")
-        return base64.b64encode(ascii).decode("utf-8")
-
-    def _data_b64decode(self, encoded):
+    @staticmethod
+    def _data_b64decode(encoded):
         return base64.b64decode(encoded).decode('UTF-8')
