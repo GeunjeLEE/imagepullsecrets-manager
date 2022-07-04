@@ -2,7 +2,7 @@ name: prs-manager
 namespace: default
 image:
     name: nigasa12/prs-manager
-    version: "0.3"
+    version: "0.4"
 imagePullPolicy: IfNotPresent
 job_schedule: "0 * * * *"
 config:
