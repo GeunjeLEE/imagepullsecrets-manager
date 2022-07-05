@@ -4,13 +4,13 @@ metadata:
   name: {{ .Values.name }}
   namespace: {{ .Values.namespace | default .Release.Namespace }}
 spec:
-  schedule:  {{ .Values.job_schedule }}
+  schedule:  {{ .Values.job_schedule | quote }}
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
   jobTemplate:
     spec:
       template:
         spec:
           serviceAccountName: {{ .Values.name }}-sa
-          successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
           containers:
           - name: {{ .Values.name }}
             image: {{ .Values.image.name }}:{{ .Values.image.version }}
