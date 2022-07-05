@@ -1,0 +1,28 @@
+name: "Docker Build"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag 버전을 입력'
+        required: true
+        default: 0.1
+
+env:
+  TAG: ${{ github.event.inputs.tag }}
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get service name
+        run: |
+          echo "SERVICE=$(echo ${{ github.repository }} | cut -d '/' -f2)" >> $GITHUB_ENV
+      - name: Build and push to dockerhub
+        uses: docker/build-push-action@v1
+        with:
+          path: .
+          repository: nigasa12/${{ env.SERVICE }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: ${{ env.VERSION }}
