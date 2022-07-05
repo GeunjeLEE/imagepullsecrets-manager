@@ -27,7 +27,6 @@ def _get_config():
             if secrets:
                 _verify_credential(secrets)
 
-            sys.exit(1)
             return secrets
     except FileNotFoundError as e:
         logging.error(f"config file not found: {e}")
