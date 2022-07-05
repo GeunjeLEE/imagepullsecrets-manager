@@ -10,6 +10,7 @@ spec:
       template:
         spec:
           serviceAccountName: {{ .Values.name }}-sa
+          successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
           containers:
           - name: {{ .Values.name }}
             image: {{ .Values.image.name }}:{{ .Values.image.version }}

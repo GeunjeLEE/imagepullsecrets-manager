@@ -4,7 +4,8 @@ image:
     name: nigasa12/prs-manager
     version: "0.4"
 imagePullPolicy: IfNotPresent
-job_schedule: "0 * * * *"
+job_schedule: "* * * * *" # every minute
+successfulJobsHistoryLimit: 10
 config:
   secrets:
     - name: ecr-dev
