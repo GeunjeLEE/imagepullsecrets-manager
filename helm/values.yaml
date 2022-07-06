@@ -2,7 +2,7 @@ name: imagepullsecrets-manager
 namespace: default
 image:
     name: nigasa12/imagepullsecrets-manager
-    version: "0.6"
+    version: "1.0.0"
 imagePullPolicy: IfNotPresent
 job_schedule: "* * * * *" # every minute
 successfulJobsHistoryLimit: 10
