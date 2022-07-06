@@ -6,7 +6,7 @@ on:
       tag:
         description: 'tag 버전을 입력'
         required: true
-        default: '0.1'
+        default: '1.0.0'
 
 env:
   TAG: ${{ github.event.inputs.tag }}
