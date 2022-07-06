@@ -1,14 +1,14 @@
 # imagePullSecrets-manager
 Create and manage `secrets` to pull images from private registry (ECR or Docker Hub) for kubernetes pod
 
-imagePullSecrets-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages secrets to use as 'imagePullSecrets'.
+imagePullSecrets-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages secrets to use as `imagePullSecrets`.
 
 ---
 
 ### What's imagePullSecrets?
 To pull images from a private registry, you must authenticate to that registry.
 
-There are several ways to authenticate the registry, you can use [imagePullSecrets]((https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials)) among them.
+There are several ways to authenticate the registry, you can use [imagePullSecrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials) among them.
 
 ---
 
@@ -23,10 +23,12 @@ if there is `imagePullSecrets`, it will be updated differently depending on the 
 - DOCKER
   - If the secret configuration is updated, replace `imagePullSecrets`.
 
-also, if there is `imagePullSecrets` that does not exist in 'config', it will be deleted
+also, if there is `imagePullSecrets` that does not exist in `config(in helm value)`, it will be deleted
 
 ## How to use?
-imagePullSecrets-manager is deployed using helm.
+imagePullSecrets-manager is deployed using helm.<br>
+After deployment, imagePullSecrets-manager automatically creates and manages secrets by referring to the `config(in helm value)`.
+
 ### 1. configure
 
 Edit the helm value(default or create custom value) to manage imagePullSecrets-manager.
