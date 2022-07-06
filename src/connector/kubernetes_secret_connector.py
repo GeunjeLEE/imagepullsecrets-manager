@@ -13,7 +13,7 @@ class KubernetesSecretConnector:
     def secret_list_by_ns(self):
         try:
             secrets = self.core_api.list_secret_for_all_namespaces(
-                label_selector="created_by=private_registry_secret_manager",
+                label_selector="created_by=imagePullSecrets-manager",
             ).items
         except Exception as e:
             raise e

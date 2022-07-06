@@ -32,4 +32,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: nigasa12/prs-manager:${{ env.TAG }}
+          tags: nigasa12/imagepullsecrets-manager-manager:${{ env.TAG }}

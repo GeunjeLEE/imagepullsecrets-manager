@@ -1,47 +1,50 @@
-# private-registry-secret-manager(a.k.a prs-manager)
-Create and manage `Private Registry Secret` to pull images from private registry (ECR or Docker Hub) for kubernetes pod
+# imagePullSecrets-manager
+Create and manage `secrets` to pull images from private registry (ECR or Docker Hub) for kubernetes pod
 
-prs-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages `Private Registry Secrets`.
+imagePullSecrets-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages secrets to use as 'imagePullSecrets'.
 
 ---
 
-### What's the Private Registry Secret?
+### What's imagePullSecrets?
 To pull images from a private registry, you must authenticate to that registry.
 
-There are several ways to authenticate the registry,<br>
-but [You can authenticate using a kubernetes secret type of type dockerconfigjson.](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials)
-
-prs-manager calls it `Private Registry Secret`.
+There are several ways to authenticate the registry, you can use [imagePullSecrets]((https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials)) among them.
 
 ---
 
-### How 'Private Registry Secret' is managed
+### How imagePullSecrets is managed
 
-By default, if there is no `private registry secret`, it will be created
+By default, if there is no `imagePullSecrets`, it will be created
 
-if there is `personal registration secret`, it will be updated differently depending on the type.<br>
-(prs-manager manages only `secret` created by itself.)
+if there is `imagePullSecrets`, it will be updated differently depending on the type.<br>
+(imagePullSecrets-manager manages only `secret` created by itself.)
 - ECR
-  - If the ECR token expires, update token and replace `personal registration secrets`.
+  - If the ECR token expires, update token and replace `imagePullSecrets`.
 - DOCKER
-  - If the secret configuration is updated, replace `personal registration secrets`.
+  - If the secret configuration is updated, replace `imagePullSecrets`.
 
-also, if there is `personal registration secrets` that does not exist in 'secret configuration', it will be deleted
+also, if there is `imagePullSecrets` that does not exist in 'config', it will be deleted
 
 ## How to use?
+imagePullSecrets-manager is deployed using helm.
+### 1. configure
 
-### configure
+Edit the helm value(default or create custom value) to manage imagePullSecrets-manager.
 
-Edit the helm value(default or create custom value) to manage `Private Registry Secret`.
+in `config`.`secrets` section, add repository credential required to create imagePullSecrets.
+
+> If you don't know imagePullSecrets, see the documentation.<br>
+> https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 
 ```yaml
-name: prs-manager
+name: imagePullSecrets-manager
 namespace: default
 image:
-    name: nigasa12/prs-manager
-    version: "<version>"
+    name: nigasa12/imagepullsecrets-manager
+    version: <image-version>
 imagePullPolicy: IfNotPresent
-job_schedule: "0 * * * *"
+job_schedule: "* * * * *" # every minute
+successfulJobsHistoryLimit: 10
 config:
   secrets:
     - name: ecr-dev
@@ -59,24 +62,23 @@ config:
         docker_user: foobargem
         docker_password: password
         docker_email: foobargem@example.com
+
 ```
 
 ### deploy
 
-`psr-manager` is deployed using the local helm chart.
-
 - using default value
 ```bash
-helm install prs-manager ./helm
+helm install imagePullSecrets-manager ./helm
 ```
 - using custom value
 ```bash
 vim {path}/values.yaml
-helm install prs-manager -f values.yaml {prs-manager}/helm
+helm install imagePullSecrets-manager -f values.yaml /{path}/helm
 ```
 
 ### update
 
 ```
-helm upgrade prs-manager {-f values.yaml} ./helm
+helm upgrade imagePullSecrets-manager {-f values.yaml} ./helm
 ```

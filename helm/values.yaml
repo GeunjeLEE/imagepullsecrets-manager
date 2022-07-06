@@ -1,7 +1,7 @@
-name: prs-manager
+name: imagePullSecrets-manager
 namespace: default
 image:
-    name: nigasa12/prs-manager
+    name: nigasa12/imagepullsecrets-manager
     version: "0.6"
 imagePullPolicy: IfNotPresent
 job_schedule: "* * * * *" # every minute
