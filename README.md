@@ -1,7 +1,7 @@
-# imagePullSecrets-manager
+# imagepullsecrets-manager
 Create and manage `secrets` to pull images from private registry (ECR or Docker Hub) for kubernetes pod
 
-imagePullSecrets-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages secrets to use as `imagePullSecrets`.
+imagepullsecrets-manager works as [a kubernetes cronjob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and easily creates and manages secrets to use as `imagePullSecrets`.
 
 ---
 
@@ -17,7 +17,7 @@ There are several ways to authenticate the registry, you can use [imagePullSecre
 By default, if there is no `imagePullSecrets`, it will be created
 
 if there is `imagePullSecrets`, it will be updated differently depending on the type.<br>
-(imagePullSecrets-manager manages only `secret` created by itself.)
+(imagepullsecrets-manager manages only `secret` created by itself.)
 - ECR
   - If the ECR token expires, update token and replace `imagePullSecrets`.
 - DOCKER
@@ -26,12 +26,12 @@ if there is `imagePullSecrets`, it will be updated differently depending on the 
 also, if there is `imagePullSecrets` that does not exist in `config(in helm value)`, it will be deleted
 
 ## How to use?
-imagePullSecrets-manager is deployed using helm.<br>
-After deployment, imagePullSecrets-manager automatically creates and manages secrets by referring to the `config(in helm value)`.
+imagepullsecrets-manager is deployed using helm.<br>
+After deployment, imagepullsecrets-manager automatically creates and manages secrets by referring to the `config(in helm value)`.
 
 ### 1. configure
 
-Edit the helm value(default or create custom value) to manage imagePullSecrets-manager.
+Edit the helm value(default or create custom value) to manage imagepullsecrets-manager.
 
 in `config`.`secrets` section, add repository credential required to create imagePullSecrets.
 
@@ -39,7 +39,7 @@ in `config`.`secrets` section, add repository credential required to create imag
 > https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 
 ```yaml
-name: imagePullSecrets-manager
+name: imagepullsecrets-manager
 namespace: default
 image:
     name: nigasa12/imagepullsecrets-manager
@@ -71,16 +71,16 @@ config:
 
 - using default value
 ```bash
-helm install imagePullSecrets-manager ./helm
+helm install imagepullsecrets-manager ./helm
 ```
 - using custom value
 ```bash
 vim {path}/values.yaml
-helm install imagePullSecrets-manager -f values.yaml /{path}/helm
+helm install imagepullsecrets-manager -f values.yaml /{path}/helm
 ```
 
 ### update
 
 ```
-helm upgrade imagePullSecrets-manager {-f values.yaml} ./helm
+helm upgrade imagepullsecrets-manager {-f values.yaml} ./helm
 ```

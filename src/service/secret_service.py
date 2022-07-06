@@ -18,7 +18,7 @@ class SecretService:
             kubernetes_namespace = credential['kubernetes_namespace']
             secret_data = {
                 'labels': {
-                    'created_by': 'imagePullSecrets-manager',
+                    'created_by': 'imagepullsecrets-manager',
                     'repo_type': credential['type'],
                     'expire_date': str(credential['token_expire_date'])
                 },
@@ -138,12 +138,12 @@ class SecretService:
     @staticmethod
     def _is_managed_secret(secret: object):
         if not secret.metadata.__dict__.get('_labels'):
-            logging.warning(f"{secret.metadata.__dict__.get('_name')} has no labels. may be not a secret managed by imagePullSecrets-manager")
+            logging.warning(f"{secret.metadata.__dict__.get('_name')} has no labels. may be not a secret managed by imagepullsecrets-manager")
             logging.warning('skip update processing')
             return False
 
-        if not secret.metadata.labels.get('created_by') or secret.metadata.labels['created_by'] != "imagePullSecrets-manager":
-            logging.warning(f"{secret.metadata.__dict__.get('_name')} is not a secret managed by imagePullSecrets-manager")
+        if not secret.metadata.labels.get('created_by') or secret.metadata.labels['created_by'] != "imagepullsecrets-manager":
+            logging.warning(f"{secret.metadata.__dict__.get('_name')} is not a secret managed by imagepullsecrets-manager")
             logging.warning('skip update processing')
             return False
 

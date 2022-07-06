@@ -1,4 +1,4 @@
-name: imagePullSecrets-manager
+name: imagepullsecrets-manager
 namespace: default
 image:
     name: nigasa12/imagepullsecrets-manager
