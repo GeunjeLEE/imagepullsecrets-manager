@@ -25,6 +25,10 @@ if there is `imagePullSecrets`, it will be updated differently depending on the 
 
 also, if there is `imagePullSecrets` that does not exist in `config(in helm value)`, it will be deleted
 
+## Prerequisite
+- kubectl
+- helm
+
 ## How to use?
 imagepullsecrets-manager is deployed using helm.<br>
 After deployment, imagepullsecrets-manager automatically creates and manages secrets by referring to the `config(in helm value)`.
