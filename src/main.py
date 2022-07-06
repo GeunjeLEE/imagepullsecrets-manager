@@ -19,6 +19,7 @@ def _verify_credential(secrets):
             if expected_key not in actual_keys:
                 raise Exception(f'incorrect credential!, [{expected_key}] not found')
 
+
 def _get_config():
     try:
         with open("./conf/secret.yaml") as f:
@@ -31,6 +32,7 @@ def _get_config():
     except FileNotFoundError as e:
         logging.error(f"config file not found: {e}")
         sys.exit(1)
+
 
 def main():
     secrets = _get_config()

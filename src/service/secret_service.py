@@ -56,7 +56,10 @@ class SecretService:
 
         if not k8s_secret:
             self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=True)
-            return 0
+            return False
+
+        if not self._is_managed_secret(k8s_secret):
+            return False
 
         if k8s_secret.metadata.labels['repo_type'] == "DOCKER":
             if self._is_configuration_updated(k8s_secret, secret_data):
@@ -131,6 +134,20 @@ class SecretService:
             'token': authorization['authorizationData'][0]['proxyEndpoint'],
             'token_expire_date': authorization['authorizationData'][0]['expiresAt']
         }
+
+    @staticmethod
+    def _is_managed_secret(secret: object):
+        if not secret.metadata.__dict__.get('_labels'):
+            logging.warning(f"{secret.metadata.__dict__.get('_name')} has no labels. may be not a secret managed by prd-manager")
+            logging.warning('skip update processing')
+            return False
+
+        if not secret.metadata.labels.get('created_by') or secret.metadata.labels['created_by'] != "private_registry_secret_manager":
+            logging.warning(f"{secret.metadata.__dict__.get('_name')} is not a secret managed by prs-manager")
+            logging.warning('skip update processing')
+            return False
+
+        return True
 
     @staticmethod
     def _is_token_expired(token_expiration_float):

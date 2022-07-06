@@ -8,7 +8,7 @@ class EcrConnector:
         self.aws_access_key_id = aws_credentials['aws_access_key_id']
         self.aws_secret_access_key = aws_credentials['aws_secret_access_key']
         self.aws_ecr_repository_region = aws_credentials['aws_ecr_repository_region']
-        self.login()
+        self.client = self.login()
 
     def login(self):
         try:
@@ -16,10 +16,9 @@ class EcrConnector:
                 aws_access_key_id=self.aws_access_key_id,
                 aws_secret_access_key=self.aws_secret_access_key
             )
+            return sess.client('ecr', region_name=self.aws_ecr_repository_region)
         except Exception as e:
             raise e
-
-        self.client = sess.client('ecr', region_name=self.aws_ecr_repository_region)
 
     def get_authorization_token(self):
         try:

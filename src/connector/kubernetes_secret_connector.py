@@ -1,3 +1,4 @@
+from kubernetes.client import exceptions as k8s_exceptions
 from kubernetes import client as k8s_client, config as k8s_config
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -5,9 +6,9 @@ logging.basicConfig(level=logging.INFO)
 
 class KubernetesSecretConnector:
     def __init__(self):
-        self.config        = k8s_config.load_incluster_config()
+        self.config = k8s_config.load_incluster_config()
         self.secret_client = k8s_client.V1Secret()
-        self.core_api      = k8s_client.CoreV1Api()
+        self.core_api = k8s_client.CoreV1Api()
 
     def secret_list_by_ns(self):
         try:
@@ -38,11 +39,11 @@ class KubernetesSecretConnector:
         except Exception as e:
             raise e
 
-    def create(self, name, data, namespace = 'default', init = False):
+    def create(self, name, data, namespace='default', init=False):
         # define
         self.secret_client.metadata = k8s_client.V1ObjectMeta(
-            name   = name,
-            labels = data['labels']
+            name=name,
+            labels=data['labels']
         )
         self.secret_client.data = data['body']
 
@@ -55,10 +56,12 @@ class KubernetesSecretConnector:
             else:
                 self.core_api.patch_namespaced_secret(name=name, namespace=namespace, body=self.secret_client)
                 logging.info(f'{name} has been updated successfully!')
+        except k8s_exceptions.ApiException as e:
+            logging.error(f'({e.status}){e.body}')
         except Exception as e:
             raise e
 
-    def delete(self, name, namespace = 'default'):
+    def delete(self, name, namespace='default'):
         try:
             self.core_api.delete_namespaced_secret(name=name,namespace=namespace)
             logging.info(f'found the old secret {name}, it will be deleted!')
