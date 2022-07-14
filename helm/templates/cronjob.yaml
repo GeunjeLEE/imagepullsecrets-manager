@@ -17,7 +17,7 @@ spec:
             imagePullPolicy: {{ .Values.imagePullPolicy }}
             volumeMounts:
             - name: application-conf
-              mountPath: /usr/src/conf/secret.yaml
+              mountPath: /usr/src/conf/credentials.yaml
               subPath: secret.yaml
               readOnly: true
           restartPolicy: OnFailure

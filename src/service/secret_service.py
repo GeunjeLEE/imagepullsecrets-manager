@@ -3,14 +3,13 @@ from connector.ecr_connector import EcrConnector
 import base64
 import json
 import logging
-import sys
 import time
 
 
 class SecretService:
-    def __init__(self, secrets):
+    def __init__(self, raw_credentials):
         self.secret_connector = KubernetesSecretConnector()
-        self.credentials = self._set(secrets)
+        self.credentials = self._set(raw_credentials)
 
     def run(self):
         for credential in self.credentials:
@@ -20,7 +19,7 @@ class SecretService:
                 'labels': {
                     'created_by': 'imagepullsecrets-manager',
                     'repo_type': credential['type'],
-                    'expire_date': str(credential['token_expire_date'])
+                    'token_expiration_date': str(credential['token_expiration_date'])
                 },
                 'body': {
                     '.dockerconfigjson': credential['dockerconfigjson']
@@ -30,8 +29,6 @@ class SecretService:
             self._update_secret(secret_name, secret_data, kubernetes_namespace)
 
     def clean_up(self):
-        actual_secret_list_by_ns = self.secret_connector.secret_list_by_ns()
-
         credential_by_ns = {}
         for credential in self.credentials:
             credential_by_ns[credential['kubernetes_namespace']] = []
@@ -39,42 +36,25 @@ class SecretService:
         for credential in self.credentials:
             credential_by_ns[credential['kubernetes_namespace']].append(credential['name'])
 
+        actual_secret_list_by_ns = self.secret_connector.secret_list_by_ns()
         for namespace, _ in actual_secret_list_by_ns.items():
-            for actual_name in actual_secret_list_by_ns[namespace]:
-                if not credential_by_ns.get(namespace) or actual_name not in credential_by_ns[namespace]:
-                    self.secret_connector.delete(actual_name, namespace)
+            for actual_secret_name in actual_secret_list_by_ns[namespace]:
+                if not credential_by_ns.get(namespace) or actual_secret_name not in credential_by_ns[namespace]:
+                    self.secret_connector.delete(actual_secret_name, namespace)
 
-    def _set(self, secrets):
+    def _set(self, credentials):
         results = []
-        for secret in secrets:
-            results.append(self._generate_credential(secret))
+        for credential in credentials:
+            results.append(self._get_additional_data(credential))
 
         return results
 
-    def _update_secret(self, secret_name, secret_data, kubernetes_namespace):
-        k8s_secret = self.secret_connector.get(secret_name, kubernetes_namespace)
-
-        if not k8s_secret:
-            self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=True)
-            return False
-
-        if not self._is_managed_secret(k8s_secret):
-            return False
-
-        if k8s_secret.metadata.labels['repo_type'] == "DOCKER":
-            if self._is_configuration_updated(k8s_secret, secret_data):
-                self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=False)
-        elif k8s_secret.metadata.labels['repo_type'] == "ECR":
-            token_expiration = float(k8s_secret.metadata.labels['expire_date'])
-            if self._is_token_expired(token_expiration):
-                self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=False)
-
-    def _generate_credential(self, secret):
-        credential = secret
-        if secret['type'] == 'ECR':
-            ecr_authorization_token = self._get_ecr_authorization_token(secret['credential'])
+    def _get_additional_data(self, raw_credential):
+        credential = raw_credential
+        if raw_credential['type'] == 'ECR':
+            ecr_authorization_token = self._get_ecr_authorization_token(raw_credential['credential'])
             # convert to unix time
-            credential['token_expire_date'] = time.mktime(ecr_authorization_token['token_expire_date'].timetuple())
+            credential['token_expiration_date'] = time.mktime(ecr_authorization_token['token_expiration_date'].timetuple())
 
             # server key has token...
             user, password = self._data_b64decode(ecr_authorization_token['server']).split(':')
@@ -82,21 +62,35 @@ class SecretService:
             server = ecr_authorization_token['token']
             email = 'service@cloudforet.io'
 
-        elif secret['type'] == 'DOCKER':
-            credential['token_expire_date'] = None
+        elif raw_credential['type'] == 'DOCKER':
+            credential['token_expiration_date'] = None
 
-            user = secret['credential']['docker_user']
-            password = secret['credential']['docker_password']
-            server = secret['credential']['docker_registry']
-            email = secret['credential']['docker_email']
-
-        else:
-            logging.error("type error")
-            sys.exit(1)
+            user = raw_credential['credential']['docker_user']
+            password = raw_credential['credential']['docker_password']
+            server = raw_credential['credential']['docker_registry']
+            email = raw_credential['credential']['docker_email']
 
         credential['dockerconfigjson'] = self._generate_dockerjson(server, user, password, email)
 
         return credential
+
+    def _update_secret(self, secret_name, secret_data, kubernetes_namespace):
+        target_secret = self.secret_connector.get(secret_name, kubernetes_namespace)
+
+        if not target_secret:
+            self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=True)
+            return False
+
+        if not self._is_managed_secret(target_secret):
+            return False
+
+        if target_secret.metadata.labels['repo_type'] == "DOCKER":
+            if self._is_configuration_updated(target_secret, secret_data):
+                self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=False)
+        elif target_secret.metadata.labels['repo_type'] == "ECR":
+            token_expiration_date = float(target_secret.metadata.labels['token_expiration_date'])
+            if self._is_token_expired(token_expiration_date):
+                self.secret_connector.create(secret_name, secret_data, kubernetes_namespace, init=False)
 
     def _generate_dockerjson(self, url, username, password, email):
         auth = self._data_b64encode(f'{username}:{password}')
@@ -132,7 +126,7 @@ class SecretService:
         return {
             'server': authorization['authorizationData'][0]['authorizationToken'],
             'token': authorization['authorizationData'][0]['proxyEndpoint'],
-            'token_expire_date': authorization['authorizationData'][0]['expiresAt']
+            'token_expiration_date': authorization['authorizationData'][0]['expiresAt']
         }
 
     @staticmethod

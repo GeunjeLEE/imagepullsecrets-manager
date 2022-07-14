@@ -1,3 +1,4 @@
 boto3==1.21.38
 kubernetes==24.2.0
 PyYAML==6.0
+schematics==2.1.1
