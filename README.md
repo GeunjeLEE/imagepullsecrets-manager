@@ -52,7 +52,7 @@ imagePullPolicy: IfNotPresent
 job_schedule: "* * * * *" # every minute
 successfulJobsHistoryLimit: 10
 config:
-  secrets:
+  credentials:
     - name: ecr-dev
       kubernetes_namespace: default
       type: ECR
