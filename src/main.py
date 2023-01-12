@@ -30,6 +30,7 @@ def _get_config():
     except Exception as e:
         raise e
 
+
 def main():
     credentials = _get_config()
     secret_service = SecretService(credentials)

@@ -39,13 +39,13 @@ class KubernetesSecretConnector:
         except Exception as e:
             raise e
 
-    def create(self, name, data, namespace='default', init=False):
+    def create(self, name, manifest, namespace='default', init=False):
         # define
         self.secret_client.metadata = k8s_client.V1ObjectMeta(
             name=name,
-            labels=data['labels']
+            labels=manifest['labels']
         )
-        self.secret_client.data = data['body']
+        self.secret_client.data = manifest['body']
 
         # apply
         try:
