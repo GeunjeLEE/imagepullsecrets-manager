@@ -12,30 +12,30 @@ There are several ways to authenticate the registry, you can use [imagePullSecre
 
 ---
 
-### How imagePullSecrets is managed
+### How imagePullSecrets are managed
 
-By default, if there is no `imagePullSecrets`, it will be created
+By default, `imagePullSecrets` are created if they don't exist.
 
-if there is `imagePullSecrets`, it will be updated differently depending on the type.<br>
+if there are `imagePullSecrets`, They will be updated differently depending on the type.<br>
 (imagepullsecrets-manager manages only `secret` created by itself.)
 - ECR
-  - If the ECR token expires, update token and replace `imagePullSecrets`.
+  - If the ECR token expires, update token and update `imagePullSecrets`.
 - DOCKER
-  - If the secret configuration is updated, replace `imagePullSecrets`.
+  - If the secret configuration is updated, update `imagePullSecrets`.
 
-also, if there is `imagePullSecrets` that does not exist in `config(in helm value)`, it will be deleted
+Also, `imagePullSecrets` are deleted when they are deleted from configuration.
 
 ## Prerequisite
 - kubectl
 - helm
 
 ## How to use?
-imagepullsecrets-manager is deployed using helm.<br>
-After deployment, imagepullsecrets-manager automatically creates and manages secrets by referring to the `config(in helm value)`.
+imagepullsecrets-manager are deployed using helm.<br>
+imagepullsecrets-manager automatically creates and manages secrets by referring to the `config(in helm value)`.
 
 ### 1. configure
 
-Edit the helm value(default or create custom value) to manage imagepullsecrets-manager.
+Edit the helm value(default or create custom value) to config imagepullsecrets-manager.
 
 in `config`.`secrets` section, add repository credential required to create imagePullSecrets.
 
