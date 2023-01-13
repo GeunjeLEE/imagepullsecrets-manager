@@ -31,8 +31,8 @@ Also, `imagePullSecrets` are deleted when they are deleted from configuration.
 - helm
 
 ## How to use?
-imagepullsecrets-manager are deployed using helm.<br>
-imagepullsecrets-manager automatically creates and manages secrets by referring to the `config(in helm value)`.
+imagepullsecrets-manager is deployed using helm.<br>
+it automatically creates and manages secrets by referring to the `config(in helm value)`.
 
 ### 1. configure
 
