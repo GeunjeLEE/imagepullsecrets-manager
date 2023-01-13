@@ -13,6 +13,7 @@ There are several ways to authenticate the registry, you can use [imagePullSecre
 ---
 
 ### How imagePullSecrets are managed
+![스크린샷 2023-01-13 오전 10 43 11](https://user-images.githubusercontent.com/19552819/212217761-0f9d8ff3-300d-4621-9902-2e22928edf0c.png)
 
 By default, `imagePullSecrets` are created if they don't exist.
 
