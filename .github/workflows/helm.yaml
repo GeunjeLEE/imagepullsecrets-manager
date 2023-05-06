@@ -19,14 +19,13 @@ jobs:
           git config user.name "GeunjeLEE"
           git config user.email "nigasa12@gmail.com"
 
-      - name: Install chart-releaser
-        run: |
-          cd /tmp/
-          git clone https://github.com/helm/chart-releaser
-          cd chart-releaser
-          go mod download
-          go install ./...
+      - name: Install Helm
+        uses: azure/setup-helm@v3
 
       - name: Run chart-releaser
-        run: |
-          cr upload --owner ${{ github.repository_owner }} --git-repo helm_charts --package-path helm --token ${{ secrets.PAT_TOKEN }}
+        uses: helm/chart-releaser-action@v1.5.0
+        with:
+          charts_dir: helm
+          GITHUB_REPOSITORY: ${{ github.repository_owner }}/helm_charts
+        env:
+          CR_TOKEN: "${{ secrets.PAT_TOKEN }}"
