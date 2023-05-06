@@ -24,13 +24,34 @@ jobs:
 
       - name: Install Helm
         uses: azure/setup-helm@v3
+        
+      - name: Install chart-releaser
+        run: |
+          curl -sSLo cr.tar.gz "https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz"
+          tar -xzf cr.tar.gz
+          rm -f cr.tar.gz
+          
+      - name: Package and puload helm chart
+        run : |
+          # package chart
+          ./cr package helm/
+          # upload chart to github relases
+          ./cr upload \
+              --owner ${{ github.repository_owner }} \
+              --git-repo "helm_charts" \
+              --token ${{ secrets.PAT_TOKEN }} \
+              --release-name-template "{{ .Version }}"
+              
+      - name: Update index
+        run: |
+          git config user.email "nigasa12@gmail.com"
+          git config user.name "GeunjeLEE"
+          ./cr index \
+              --owner ${{ github.repository_owner }} \
+              --git-repo "helm_charts" \
+              --token ${{ secrets.PAT_TOKEN }} \
+              --release-name-template "{{ .Version }}" \
+              --index-path ./index.yaml \
+              --charts-repo https://${{ github.repository_owner }}.github.io/helm_charts \
+              --push
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
-        with:
-          charts_dir: helm
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          CR_OWNER: ${{ github.repository_owner }}
-          CR_GIT_REPO: helm_charts
-          CR_SKIP_EXISTING: true
