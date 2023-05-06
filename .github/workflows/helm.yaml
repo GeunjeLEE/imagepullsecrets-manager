@@ -31,5 +31,5 @@ jobs:
       - name: package and puload helm chart
         run : |
           helm package helm --destination .deploy
-          cr upload --owner ${{ github.repository_owner }} --git-repo helm_charts --package-path .deploy --token ${{ secrets.PAT_TOKEN }}
+          ./cr upload --owner ${{ github.repository_owner }} --git-repo helm_charts --package-path .deploy --token ${{ secrets.PAT_TOKEN }}
 
