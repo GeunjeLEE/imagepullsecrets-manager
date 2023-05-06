@@ -26,6 +26,6 @@ jobs:
         uses: helm/chart-releaser-action@v1.5.0
         with:
           charts_dir: helm
-          chrts_repo_url: https://GeunjeLEE.github.io/helm_charts
+          charts_repo_url: https://GeunjeLEE.github.io/helm_charts
         env:
           CR_TOKEN: "${{ secrets.PAT_TOKEN }}"
