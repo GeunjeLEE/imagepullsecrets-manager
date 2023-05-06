@@ -21,12 +21,15 @@ jobs:
 
       - name: Install Helm
         uses: azure/setup-helm@v3
+        
+      - name: Install chart-releaser
+        run: |
+          curl -sSLo cr.tar.gz "https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz"
+          tar -xzf cr.tar.gz
+          rm -f cr.tar.gz
+          
+      - name: package and puload helm chart
+        run : |
+          helm package helm --destination .deploy
+          cr upload --owner ${{ github.repository_owner }} --git-repo helm_charts --package-path .deploy --token ${{ secrets.PAT_TOKEN }}
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
-        with:
-          charts_dir: helm
-        env:
-          CR_TOKEN: "${{ secrets.PAT_TOKEN }}"
-          CR_OWNER: ${{ github.repository_owner }}
-          CR_GIT_REPO: helm_charts
