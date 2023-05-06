@@ -87,7 +87,7 @@ class KubernetesManager:
 
         if not labels.get('created_by') or labels['created_by'] != "imagepullsecrets-manager":
             logging.warning(
-                f"{secret_name} is might not a secret managed by imagepullsecrets-model")
+                f"{secret_name} is might not a secret managed by imagepullsecrets-manager")
             logging.warning('skip update processing')
             return False
 

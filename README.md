@@ -44,10 +44,10 @@ in `config`.`secrets` section, add repository credential required to create imag
 > https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 
 ```yaml
-name: imagepullsecrets-model
+name: imagepullsecrets-manager
 namespace: default
 image:
-    name: nigasa12/imagepullsecrets-model
+    name: nigasa12/imagepullsecrets-manager
     version: <image-version>
 imagePullPolicy: IfNotPresent
 job_schedule: "* * * * *" # every minute
@@ -76,12 +76,12 @@ config:
 
 - using default value
 ```bash
-helm install imagepullsecrets-model ./helm
+helm install imagepullsecrets-manager ./helm
 ```
 - using custom value
 ```bash
 vim {path}/values.yaml
-helm install imagepullsecrets-model -f values.yaml /{path}/helm
+helm install imagepullsecrets-manager -f values.yaml /{path}/helm
 ```
 
 ### update

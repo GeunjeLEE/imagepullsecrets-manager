@@ -1,7 +1,7 @@
-name: imagepullsecrets-model
+name: imagepullsecrets-manager
 namespace: default
 image:
-    name: nigasa12/imagepullsecrets-model
+    name: nigasa12/imagepullsecrets-manager
     version: "1.0.1"
 imagePullPolicy: IfNotPresent
 job_schedule: "* * * * *" # every minute
