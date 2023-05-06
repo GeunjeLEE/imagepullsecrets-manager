@@ -40,7 +40,8 @@ jobs:
               --owner ${{ github.repository_owner }} \
               --git-repo "helm_charts" \
               --token ${{ secrets.PAT_TOKEN }} \
-              --release-name-template "{{ .Version }}"
+              --release-name-template "{{ .Version }}" \
+              --skip-existing true
               
       - name: Update index
         run: |
