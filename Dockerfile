@@ -2,12 +2,11 @@ FROM python:3.8
 
 COPY ./src /usr/src
 
-RUN mkdir -p /usr/src/conf
-
 WORKDIR /usr/src/
 
-COPY requirements.txt ./
+RUN mkdir -p /usr/src/conf \
+    && pip install --no-cache-dir -r pkg/requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+ENTRYPOINT [ "python" ]
 
-CMD [ "python", "./main.py" ]
+CMD ["./main.py"]

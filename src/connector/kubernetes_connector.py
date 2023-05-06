@@ -4,16 +4,16 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-class KubernetesSecretConnector:
+class KubernetesConnector:
     def __init__(self):
-        self.config = k8s_config.load_incluster_config()
-        self.secret_client = k8s_client.V1Secret()
+        self.config = k8s_config.load_kube_config()
         self.core_api = k8s_client.CoreV1Api()
+        self.secret_client = k8s_client.V1Secret()
 
-    def secret_list_by_ns(self):
+    def list_managed_secrets_by_namespace(self, label):
         try:
             secrets = self.core_api.list_secret_for_all_namespaces(
-                label_selector="created_by=imagepullsecrets-manager",
+                label_selector=f"created_by={label}",
             ).items
         except Exception as e:
             raise e
@@ -27,7 +27,7 @@ class KubernetesSecretConnector:
 
         return ret
 
-    def get(self, secret_name, namespace):
+    def get_secret(self, secret_name, namespace):
         try:
             return self.core_api.read_namespaced_secret(secret_name, namespace)
         except k8s_client.exceptions.ApiException as e:
@@ -39,7 +39,7 @@ class KubernetesSecretConnector:
         except Exception as e:
             raise e
 
-    def create(self, name, manifest, namespace='default', init=False):
+    def create_secret(self, name, manifest, namespace='default'):
         # define
         self.secret_client.metadata = k8s_client.V1ObjectMeta(
             name=name,
@@ -49,21 +49,34 @@ class KubernetesSecretConnector:
 
         # apply
         try:
-            if init:
-                self.secret_client.type = "kubernetes.io/dockerconfigjson"
-                self.core_api.create_namespaced_secret(namespace=namespace, body=self.secret_client)
-                logging.info(f'{name} has been created successfully!')
-            else:
-                self.core_api.patch_namespaced_secret(name=name, namespace=namespace, body=self.secret_client)
-                logging.info(f'{name} has been updated successfully!')
+            logging.info(f'Creating {name}...')
+            self.secret_client.type = "kubernetes.io/dockerconfigjson"
+            self.core_api.create_namespaced_secret(namespace=namespace, body=self.secret_client)
         except k8s_exceptions.ApiException as e:
             logging.error(f'({e.status}){e.body}')
         except Exception as e:
             raise e
 
-    def delete(self, name, namespace='default'):
+    def patch_secret(self, name, manifest, namespace='default'):
+        # define
+        self.secret_client.metadata = k8s_client.V1ObjectMeta(
+            name=name,
+            labels=manifest['labels']
+        )
+        self.secret_client.data = manifest['body']
+
+        # apply
         try:
+            logging.info(f'Patching {name}...')
+            self.core_api.patch_namespaced_secret(name=name, namespace=namespace, body=self.secret_client)
+        except k8s_exceptions.ApiException as e:
+            logging.error(f'({e.status}){e.body}')
+        except Exception as e:
+            raise e
+
+    def delete_secret(self, name, namespace='default'):
+        try:
+            logging.info(f'Deleting {name}...')
             self.core_api.delete_namespaced_secret(name=name,namespace=namespace)
-            logging.info(f'found the old secret {name}, it will be deleted!')
         except Exception as e:
             raise e
