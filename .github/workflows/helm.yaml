@@ -19,8 +19,13 @@ jobs:
           git config user.name "GeunjeLEE"
           git config user.email "nigasa12@gmail.com"
 
-      - name: Install Helm
-        uses: azure/setup-helm@v3
+      - name: Install chart-releaser
+        run: |
+          cd /tmp/
+          git clone https://github.com/helm/chart-releaser
+          cd chart-releaser
+          go mod download
+          go install ./...
 
       - name: Run chart-releaser
         run: |
