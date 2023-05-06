@@ -14,13 +14,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 
-
-      - name: Configure Git
+        
+      - name: Move helm to tmp directory
         run: |
-          git config user.name "GeunjeLEE"
-          git config user.email "nigasa12@gmail.com"
+          cp -irp helm /tmp/helm
+          
+      - name: Check out chart repo
+        uses: actions/checkout@master
+        with:
+          repository: ${{ github.repository_owner }}/helm_charts
+          ref: gh-pages
+          token: ${{ secrets.PAT_TOKEN }}    
 
       - name: Install Helm
         uses: azure/setup-helm@v3
@@ -34,14 +38,14 @@ jobs:
       - name: Package and puload helm chart
         run : |
           # package chart
-          ./cr package helm/
+          ./cr package /tmp/helm
           # upload chart to github relases
           ./cr upload \
               --owner ${{ github.repository_owner }} \
               --git-repo "helm_charts" \
               --token ${{ secrets.PAT_TOKEN }} \
               --release-name-template "{{ .Version }}" \
-              --skip-existing true
+              --skip-existing true          
               
       - name: Update index
         run: |
