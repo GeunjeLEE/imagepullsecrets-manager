@@ -18,7 +18,7 @@ spec:
             volumeMounts:
             - name: application-conf
               mountPath: /usr/src/conf/credentials.yaml
-              subPath: secret.yaml
+              subPath: credentials.yaml
               readOnly: true
           restartPolicy: OnFailure
           volumes:

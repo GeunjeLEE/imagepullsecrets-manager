@@ -6,5 +6,5 @@ metadata:
   annotations:
     auto-deploy-flag: {{ print .Values.config | sha256sum }}
 data:
-  secret.yaml: |-
+  credentials.yaml: |-
 {{- toYaml .Values.config | nindent 4 }}
